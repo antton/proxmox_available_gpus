@@ -12,7 +12,7 @@ curl -X GET -H "Authorization: Bearer $(echo -n 'antton' | base64)" http://local
 ```json
 {
   "servidor": "server1",
-  "tarjetas_disponibles": ["0000:41:00.0", "0000:61:00.0"],
+  "tarjetas_disponibles": ["0000:61:00.0"],
   "tarjetas_en_uso": ["0000:41:00.0"]
 }
 ```
