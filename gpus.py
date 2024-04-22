@@ -1,6 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import subprocess
+import base64
 
 # Función para obtener los IDs PCI de las tarjetas GPU disponibles en el servidor
 def obtener_pci_ids_disponibles(servidor):
@@ -41,17 +42,29 @@ def gpu_libre(tarjetas_disponibles, tarjetas_en_uso):
 class GPURequestHandler(BaseHTTPRequestHandler):
     # Manejar las peticiones GET
     def do_GET(self):
+        # Obtener el encabezado de autorización
+        autorizacion = self.headers.get('Authorization')
+
+        # Verificar si se proporcionó un encabezado de autorización y si es válido
+        if not autorizacion or not verificar_autorizacion(autorizacion):
+            self.send_response(401)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"error": "Credenciales inválidas"}).encode())
+            return
+
+        # Obtener el servidor de la URL
+        partes_url = self.path.split('/')
+        if len(partes_url) < 3:
+            self.send_response(400)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"error": "Falta el nombre del servidor en la URL"}).encode())
+            return
+        servidor = partes_url[2]
+
+        # Procesar la solicitud
         if self.path.startswith('/gpu/'):
-            # Obtener el nombre del servidor de la URL
-            servidor = self.path.split('/')[2]
-
-            if not servidor:
-                self.send_response(400)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
-                self.wfile.write(json.dumps({"error": "Falta el nombre del servidor en la URL"}).encode())
-                return
-
             if self.path.startswith('/gpu/libre/'):
                 # Obtener las tarjetas GPU disponibles en el servidor
                 tarjetas_disponibles = obtener_tarjetas_gpu_disponibles(servidor)
@@ -86,6 +99,15 @@ class GPURequestHandler(BaseHTTPRequestHandler):
                 }).encode())
         else:
             self.send_error(404)
+
+# Función para verificar la autorización
+def verificar_autorizacion(autorizacion):
+    # Decodificar el texto de autorización como Base64
+    try:
+        texto_decodificado = base64.b64decode(autorizacion.split(' ')[1]).decode()
+        return texto_decodificado == 'antton'
+    except:
+        return False
 
 # Función para ejecutar el servidor
 def run(server_class=HTTPServer, handler_class=GPURequestHandler, port=8000):
