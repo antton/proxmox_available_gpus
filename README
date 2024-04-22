@@ -1,0 +1,27 @@
+La API desarrollada en este script proporciona información sobre las tarjetas GPU disponibles en un servidor Proxmox VE y ofrece la posibilidad de verificar si hay alguna tarjeta GPU libre para su uso. 
+
+La API tiene dos endpoints principales: `/gpu/<nombre_del_servidor>` y `/gpu/libre/<nombre_del_servidor>`. 
+
+El endpoint `/gpu/<nombre_del_servidor>` devuelve un JSON que contiene información sobre todas las tarjetas GPU disponibles y las tarjetas GPU actualmente en uso en el servidor especificado. 
+
+Por ejemplo, una solicitud GET a `/gpu/server1` podría devolver:
+
+```json
+{
+  "servidor": "server1",
+  "tarjetas_disponibles": ["0000:41:00.0", "0000:61:00.0"],
+  "tarjetas_en_uso": ["0000:41:00.0"]
+}
+```
+
+El endpoint `/gpu/libre/<nombre_del_servidor>` devuelve la primera tarjeta GPU libre encontrada en el servidor especificado, si existe. 
+
+Por ejemplo, una solicitud GET a `/gpu/libre/server14` podría devolver:
+
+```json
+{
+  "tarjeta_libre": "0000:61:00.0"
+}
+```
+
+Estos endpoints son útiles para determinar la disponibilidad de tarjetas GPU en un servidor específico y para asignar automáticamente tarjetas GPU libres a las tareas que las requieran.
