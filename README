@@ -6,6 +6,9 @@ El endpoint `/gpu/<nombre_del_servidor>` devuelve un JSON que contiene informaci
 
 Por ejemplo, una solicitud GET a `/gpu/server1` podría devolver:
 
+curl -X GET -H "Authorization: Bearer $(echo -n 'antton' | base64)" http://localhost:8000/gpu/server1
+
+
 ```json
 {
   "servidor": "server1",
@@ -17,6 +20,9 @@ Por ejemplo, una solicitud GET a `/gpu/server1` podría devolver:
 El endpoint `/gpu/libre/<nombre_del_servidor>` devuelve la primera tarjeta GPU libre encontrada en el servidor especificado, si existe. 
 
 Por ejemplo, una solicitud GET a `/gpu/libre/server14` podría devolver:
+
+curl -X GET -H "Authorization: Bearer $(echo -n 'antton' | base64)" http://localhost:8000/gpu/libre/server1
+
 
 ```json
 {
